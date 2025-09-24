@@ -90,8 +90,9 @@ pipeline {
                     echo "Pipeline failed. Please check the logs for details."
                 }
     }
+        }
 
-        def waitForDeployment() {
+def waitForDeployment() {
         echo "Waiting for deployments to complete..."
         
         sh """
@@ -99,10 +100,10 @@ pipeline {
             oc get pods -n ${env.OCP_PROJECT} -l app=${env.DEPLOYMENT_NAME} -o jsonpath='{.items[*].metadata.name}' | xargs -n1 oc wait --for=condition=Ready=True --timeout=300s -n ${env.OCP_PROJECT} pod/
         """
     }
-        def verifyDeployment() {
+def verifyDeployment() {
             echo "Verifying deployment..."
             
-            def podStatus = sh(script: "oc get pods -n ${env.OCP_PROJECT} -l app=${env.DEPLOYMENT_NAME} -o jsonpath='{.items[*].status.phase}'", returnStdout: true).trim()
+    def podStatus = sh(script: "oc get pods -n ${env.OCP_PROJECT} -l app=${env.DEPLOYMENT_NAME} -o jsonpath='{.items[*].status.phase}'", returnStdout: true).trim()
             
             if (podStatus.contains("Running")) {
                 echo "Deployment verified successfully. All pods are running."
@@ -111,7 +112,7 @@ pipeline {
             }
         }
 
-        def getReplicaCount(environment) {
+def getReplicaCount(environment) {
         switch(environment) {
             case 'dev':
                 return '1'
@@ -124,8 +125,7 @@ pipeline {
         }
     }
 
-        def cleanWs() {
+def cleanWs() {
             echo "Delete old docker images..."
             sh "docker image prune -f"
         }
-}
