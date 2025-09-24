@@ -74,7 +74,7 @@ pipeline {
                 steps {
                     script {
                         withCredentials([usernamePassword(credentialsId: 'docker-registry-credentials', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-                            sh "echo $DOCKER_PASS | docker login ${env.DOCKER_REPOSITORY} -u $DOCKER_USER --password-stdin"
+                            sh "echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin"
                             sh "docker push ${env.BUILD_TAG}"
                             sh "docker logout ${env.DOCKER_REPOSITORY}"
                         }
