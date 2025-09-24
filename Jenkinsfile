@@ -2,6 +2,11 @@ pipeline {
 
     agent any 
 
+    tools {
+        jdk 'jdk11'
+        maven 'maven3'
+    }
+
     parameters {
 
         choice(name: 'ENVIRONMENT', 
@@ -37,6 +42,23 @@ pipeline {
             stage('Checkout Code') {
                 steps {
                     checkout scm
+                }
+            }
+
+            stage('Compile') {
+                steps {
+                    script {
+                        sh "mvn clean compile"
+                    }
+                }
+            }
+
+
+            stage('Build with Maven') {
+                steps {
+                    script {
+                        sh "mvn clean package -DskipTests"
+                    }
                 }
             }
 
