@@ -25,7 +25,7 @@ pipeline {
 
         OCP_PROJECT = "${params.ENVIRONMENT}"
         OCP_CLUSTER_URL = "https://api.lab.ocp.lan:6443"
-        DEPLOYMENT_NAME = "Ekart-${params.ENVIRONMENT}"
+        DEPLOYMENT_NAME = "ekart-deployment"
     }
 
     stages {
