@@ -155,6 +155,6 @@ def getReplicaCount(environment) {
 
 def cleanWs() {
             echo "Delete old docker images..."
-            sh "docker image del $(docker images -f 'dangling=true' -q) || true"
+            sh "docker image del \$(docker images -f 'dangling=true' -q) || true"
             sh "docker rmi -f \$(docker images | grep '${DOCKER_REPOSITORY}' | awk '{print \$3}') || true"
         }
