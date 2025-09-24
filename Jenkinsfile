@@ -77,6 +77,7 @@ pipeline {
                     }
                 }
             }
+        }
 
             post {
                 always {
@@ -90,42 +91,41 @@ pipeline {
                 }
     }
 
-    def waitForDeployment() {
-    echo "Waiting for deployments to complete..."
-    
-    sh """
-        oc rollout status deployment/${env.DEPLOYMENT_NAME} --watch=true
-        oc get pods -n ${env.OCP_PROJECT} -l app=${env.DEPLOYMENT_NAME} -o jsonpath='{.items[*].metadata.name}' | xargs -n1 oc wait --for=condition=Ready=True --timeout=300s -n ${env.OCP_PROJECT} pod/
-    """
-}
-    def verifyDeployment() {
-        echo "Verifying deployment..."
+        def waitForDeployment() {
+        echo "Waiting for deployments to complete..."
         
-        def podStatus = sh(script: "oc get pods -n ${env.OCP_PROJECT} -l app=${env.DEPLOYMENT_NAME} -o jsonpath='{.items[*].status.phase}'", returnStdout: true).trim()
-        
-        if (podStatus.contains("Running")) {
-            echo "Deployment verified successfully. All pods are running."
-        } else {
-            error "Deployment verification failed. Some pods are not running."
+        sh """
+            oc rollout status deployment/${env.DEPLOYMENT_NAME} --watch=true
+            oc get pods -n ${env.OCP_PROJECT} -l app=${env.DEPLOYMENT_NAME} -o jsonpath='{.items[*].metadata.name}' | xargs -n1 oc wait --for=condition=Ready=True --timeout=300s -n ${env.OCP_PROJECT} pod/
+        """
+    }
+        def verifyDeployment() {
+            echo "Verifying deployment..."
+            
+            def podStatus = sh(script: "oc get pods -n ${env.OCP_PROJECT} -l app=${env.DEPLOYMENT_NAME} -o jsonpath='{.items[*].status.phase}'", returnStdout: true).trim()
+            
+            if (podStatus.contains("Running")) {
+                echo "Deployment verified successfully. All pods are running."
+            } else {
+                error "Deployment verification failed. Some pods are not running."
+            }
+        }
+
+        def getReplicaCount(environment) {
+        switch(environment) {
+            case 'dev':
+                return '1'
+            case 'test':
+                return '2'
+            case 'prod':
+                return '3'
+            default:
+                return '1'
         }
     }
 
-    def getReplicaCount(environment) {
-    switch(environment) {
-        case 'dev':
-            return '1'
-        case 'test':
-            return '2'
-        case 'prod':
-            return '3'
-        default:
-            return '1'
-    }
-}
-
-    def cleanWs() {
-        echo "Delete old docker images..."
-        sh "docker image prune -f"
-    }
-}
+        def cleanWs() {
+            echo "Delete old docker images..."
+            sh "docker image prune -f"
+        }
 }
