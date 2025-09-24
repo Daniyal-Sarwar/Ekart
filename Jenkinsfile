@@ -63,11 +63,11 @@ pipeline {
             stage('Deploy to OpenShift') {
                 steps {
                     script {
-                        withCredentials([file(credentialsId: 'ocp-kubeconfig', variable: 'KUBECONFIG')]) {
-                            sh "oc login ${env.OCP_CLUSTER_URL} --token=$(cat $KUBECONFIG)"
+                        withCredentials([usernamePassword(credentialsId: 'ocp-user-pass', usernameVariable: 'OCP_USER', passwordVariable: 'OCP_PASS')]) {
+                            sh "oc login ${env.OCP_CLUSTER_URL} --token=${OCP_PASS} --insecure-skip-tls-verify=true"
                             sh "oc project ${env.OCP_PROJECT}"
                             sh """
-                                oc set image deployment/${env.DEPLOYMENT_NAME} my-app=${env.BUILD_TAG} --record
+                                oc set image deployment/${env.DEPLOYMENT_NAME} ekart=${env.BUILD_TAG} --record
                                 oc scale deployment/${env.DEPLOYMENT_NAME} --replicas=${getReplicaCount(params.ENVIRONMENT)}
                                 oc rollout status deployment/${env.DEPLOYMENT_NAME}
                             """
