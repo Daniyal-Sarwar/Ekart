@@ -119,7 +119,13 @@ def waitForDeployment() {
         
         sh """
             oc rollout status deployment/${env.DEPLOYMENT_NAME} --watch=true
-            oc get pods -n ${env.OCP_PROJECT} -l app=${env.DEPLOYMENT_NAME} -o jsonpath='{.items[*].metadata.name}' | xargs -n1 oc wait --for=condition=Ready=True --timeout=300s -n ${env.OCP_PROJECT} pod/
+            # Get the list of pod names and store them in a variable
+            POD_NAMES=$(oc get pods -n dev -l app=ekart-deployment -o jsonpath='{.items[*].metadata.name}')
+
+            # Loop through each pod name and run the wait command
+            for pod_name in ${POD_NAMES}; do
+            oc wait --for=condition=Ready=True --timeout=300s -n dev pod/${pod_name}
+            done
         """
     }
 def verifyDeployment() {
@@ -149,5 +155,6 @@ def getReplicaCount(environment) {
 
 def cleanWs() {
             echo "Delete old docker images..."
-            sh "docker image prune -f"
+            sh "docker image del $(docker images -f 'dangling=true' -q) || true"
+            sh "docker rmi -f \$(docker images | grep '${DOCKER_REPOSITORY}' | awk '{print \$3}') || true"
         }
