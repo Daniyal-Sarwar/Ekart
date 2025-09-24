@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ekart-deployment
+  namespace: test # Added the project name here
+  labels:
+    app: ekart
+spec:
+  selector:
+    matchLabels:
+      app: ekart
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: ekart
+    spec:
+      containers:
+        - name: ekart
+          image: kubradevops/cicd:v1
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8070
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: ekart-ssvc
+  namespace: test # Added the project name here
+  labels:
+    app: ekart
+spec:
+  selector:
+    app: ekart
+  ports:
+    - protocol: "TCP"
+      port: 8070
+      targetPort: 8070
+  type: ClusterIP # Changed to ClusterIP to make the service only accessible internally
+
+---
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ekart-ingress
+  namespace: test # Added the project name here
+  annotations:
+    # This annotation is specific to OpenShift to ensure the route uses TLS termination
+    # OpenShift's default router will handle the secure connection.
+    route.openshift.io/termination: edge
+spec:
+  rules:
+  - host: ekart.test.apps.lab.ocp.lan # Replace with your cluster's actual domain
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: ekart-ssvc
+            port:
+              number: 8070
+
