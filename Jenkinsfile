@@ -43,7 +43,7 @@ pipeline {
             stage('Build Docker Image') {
                 steps {
                     script {
-                        sh "docker build -t ${env.BUILD_TAG} ."
+                        sh "docker build -t ${env.BUILD_TAG}  -f docker/Dockerfile ."
                     }
                 }
             }
