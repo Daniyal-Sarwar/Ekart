@@ -119,12 +119,12 @@ def waitForDeployment() {
         
         sh """
             oc rollout status deployment/${env.DEPLOYMENT_NAME} -n ${env.OCP_PROJECT} --watch=true
-            # Get the list of pod names and store them in a variable
-            ekart_deployment_PODS=$(oc get pods -n ${env.OCP_PROJECT} -l app=ekart -o jsonpath='{.items[*].metadata.name}')
 
-            for POD in $ekart_deployment_PODS; do
-            echo "Waiting for pod $POD to be in 'Running' state..."
-            oc wait --for=condition=Ready pod/$POD --timeout=120s -n ${env.OCP_PROJECT}
+            ekart_deployment_PODS=\$(oc get pods -n ${env.OCP_PROJECT} -l app=${env.DEPLOYMENT_NAME} -o jsonpath='{.items[*].metadata.name}')
+
+            for POD in \$ekart_deployment_PODS; do
+            echo "Waiting for pod \$POD to be in 'Running' state..."
+            oc wait --for=condition=Ready pod/\$POD --timeout=120s -n ${env.OCP_PROJECT}
             done
 
         """
