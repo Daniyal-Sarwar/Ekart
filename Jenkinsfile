@@ -85,8 +85,8 @@ pipeline {
             stage('Deploy to OpenShift') {
                 steps {
                     script {
-                        withCredentials([usernamePassword(credentialsId: 'ocp-user-pass', usernameVariable: 'OCP_USER', passwordVariable: 'OCP_PASS')]) {
-                            sh "oc login -u ${OCP_USER} -p ${OCP_PASS} --insecure-skip-tls-verify=true --server=${env.OCP_CLUSTER_URL}"
+                        withCredentials([secretText(credentialsId: 'OCP_JENKINS_TOKEN', variable: 'OCP_TOKEN')]) {
+                            sh "oc login --token=${OCP_TOKEN} --server=${env.OCP_CLUSTER_URL}"
                             sh "oc project ${env.OCP_PROJECT}"
                             sh """
                                 oc set image deployment/${env.DEPLOYMENT_NAME} ekart=${env.BUILD_TAG} --record
