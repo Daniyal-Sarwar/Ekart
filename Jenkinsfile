@@ -85,7 +85,7 @@ pipeline {
             stage('Deploy to OpenShift') {
                 steps {
                     script {
-                        withCredentials([secretText(credentialsId: 'OCP_JENKINS_TOKEN', variable: 'OCP_TOKEN')]) {
+                        withCredentials([string(credentialsId: 'OCP_JENKINS_TOKEN', variable: 'OCP_TOKEN')]) {
                             sh "oc login --token=${OCP_TOKEN} --server=${env.OCP_CLUSTER_URL}"
                             sh "oc project ${env.OCP_PROJECT}"
                             sh """
