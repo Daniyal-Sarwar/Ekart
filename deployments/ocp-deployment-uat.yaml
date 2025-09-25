@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: ekart-deployment
-  namespace: test # Added the project name here
+  namespace: uat # Added the project name here
   labels:
     app: ekart
 spec:
@@ -27,8 +27,8 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: ekart-ssvc
-  namespace: test # Added the project name here
+  name: ekart-svc
+  namespace: uat # Added the project name here
   labels:
     app: ekart
 spec:
@@ -46,7 +46,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: ekart-ingress
-  namespace: test # Added the project name here
+  namespace: uat # Added the project name here
   annotations:
     # This annotation is specific to OpenShift to ensure the route uses TLS termination
     # OpenShift's default router will handle the secure connection.
