@@ -132,7 +132,7 @@ def waitForDeployment() {
 def verifyDeployment() {
             echo "Verifying deployment..."
             
-    def podStatus = sh(script: "oc get pods -n ${env.OCP_PROJECT} -l app=${env.DEPLOYMENT_NAME} -o jsonpath='{.items[*].status.phase}'", returnStdout: true).trim()
+    def podStatus = sh(script: "oc get pods -n ${env.OCP_PROJECT} -l app=ekart -o jsonpath='{.items[*].status.phase}'", returnStdout: true).trim()
             
             if (podStatus.contains("Running")) {
                 echo "Deployment verified successfully. All pods are running."
