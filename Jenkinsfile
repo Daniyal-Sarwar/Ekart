@@ -118,7 +118,7 @@ def waitForDeployment() {
         echo "Waiting for deployments to complete..."
         
         sh """
-            oc rollout status deployment/${env.DEPLOYMENT_NAME} --watch=true
+            oc rollout status deployment/${env.DEPLOYMENT_NAME} -n ${env.OCP_PROJECT} --watch=true
             # Get the list of pod names and store them in a variable
             ekart_deployment_PODS=$(oc get pods -n ${env.OCP_PROJECT} -l app=ekart -o jsonpath='{.items[*].metadata.name}')
 
